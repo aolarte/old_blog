@@ -1,0 +1,12 @@
+---
+layout: post
+title: Custom J2EE authentication using JASPIC (part 1)
+date: '2015-10-19T12:10:00.001-07:00'
+author: Andres Olarte
+tags: 
+modified_time: '2015-10-19T12:10:48.863-07:00'
+blogger_id: tag:blogger.com,1999:blog-3306197464901287625.post-5144017494814004447
+blogger_orig_url: http://www.javaprocess.com/2015/10/custom-j2ee-authentication-using-jaspic.html
+---
+
+The security model of J2EE applications can appear confusing at first sight. There is a disconnect between security declarations, and the authentication. &nbsp;Your application can declare what parts of your application are secured, using a variety of methods, such &nbsp;as annotations( @DeclareRoles, @RolesAllowed ), deployment descriptors (inside the web.xml), or even programmatically. &nbsp;The authentication part, however, is handled by the J2EE container (Glassfish, Weblogic, JBoss, etc). &nbsp;In some scenarios this makes sense, for example if you have a J2EE application that you sell to different companies. &nbsp;In such a case the J2EE model will enable to the App Server administrator to configure the authentication method that makes sense for his or her particular company. &nbsp;This method could be a JDBC connection to a user table, LDAP look up to company wide directory service, or even a local user database using a plain file. <br /><br />The solution for this problem is JASPIC (Java Authentication SPI for Containers), formalized by&nbsp;JSR-196.
