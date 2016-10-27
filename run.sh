@@ -1,2 +1,2 @@
 #!/bin/sh
-jekyll serve
+jekyll serve --drafts
