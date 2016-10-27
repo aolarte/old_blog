@@ -3,7 +3,6 @@ layout: post
 title: Understanding Magic Dust in Java and the JVM
 date: '2016-05-31T17:22:00.000-07:00'
 author: Andres Olarte
-comments: true
 tags:
 - classloader
 - bytecode
