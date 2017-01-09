@@ -1,7 +1,7 @@
 ---
 layout: post
 title: Understanding Magic Dust in Java and the JVM (part 1)
-date: '2016-05-31T17:22:00.000-07:00'
+date: '2017-01-09T07:00:00.000-06:00'
 author: Andres Olarte
 tags:
 - classloader
@@ -19,18 +19,17 @@ One of the questions I get every so often is:
 > Where do I put the behaviour for an annotation I just created?
 
 The answer is to this question is fairly complicated. First, because annotations don't have any behaviour. 
-They're just metadata. Second, because it will normally lead to something along the lines of:
+They're just metadata. Second, because most answers will normally lead to something along the lines of:
 
 > But annotations do seem to have behaviour, just look at all the stuff that happens when I mark a method @Transactional, @RolesAllowed, etc... 
 
-And that's a very valid point, some annotations do appear to have behavior. 
-But in reality, annotations are just the magic dust that we sprinkle in our code, indirectly causing all kinds of black magic to happen on the background. 
+And that's a very valid point, some annotations do appear to have behavior. I recently even hear people half jokingly reference to this as "Annotation Driven Development". But in reality, annotations are just the magic dust that we sprinkle in our code, indirectly causing all kinds of black magic to happen on the background. 
 
 The truth is that this service class that you annotated with with `@Transactional` will only exhibit transactional behaviour in very particular cases. 
 Instantiating your class using the `new` operator will NOT add transactional behaviour regardless of the presence of `@Transactional` annotations.
-So how do this actually work?  Let's grab our magic dust and fly away to Neverland to find out...
+So how does it actually work?  Let's grab our magic dust and fly away to Neverland to find out...
 
-# The basics, cross-cutting concerns and pointcuts
+## The basics, cross-cutting concerns and pointcuts
 
  Aspect-oriented programming or AOP is a programming paradigm that allows separation of cross cutting concerns from core concerns. 
  Cross cutting concerns are applied based on point cuts.
@@ -44,6 +43,8 @@ been widely used by frameworks to apply framework provided functionality to exis
 
 # How does it actually work?
 
+The behaviour is really injected through means separate from the annotations, the annotations really just mark where should be done. 
+We'll now look at how it's done at the Dependency Injection (DI) level, through Java Agents at runtime, and during the compile phase by using compiler annotation processors.
 
 ## Dependency Injection Container
 
@@ -65,8 +66,7 @@ public class TestService {
 
 Calling `testService.buildMessage()` will return `<p>Hello World!</p>` if the interceptor is set up correctly.
 
-In this case the core concern is building the message `Hello World`, while the cross cutting concern is applying some format to it.  
-We can apply the same cross cutting concern to multiple core concerns without changing either. We just have to define the right pointcuts.
+In this case the core concern is building the message `Hello World`, while the cross cutting concern is applying some format to it.  We can apply the same cross cutting concern to multiple core concerns without changing either. We just have to define the right pointcuts.
 
 ### Spring Dependency Injection
 
@@ -187,16 +187,12 @@ For example we can observe when the CDI context discovers a class or interface.
 public class HTMLAnnotationProcessor implements Extension {
 
     <T> void processAnnotatedType(@Observes @WithAnnotations({HTML.class}) ProcessAnnotatedType<T> pat) {
-
         AnnotatedTypeBuilder annotatedTypeBuilder = new AnnotatedTypeBuilder()
                 .readFromType(pat.getAnnotatedType())
                 .addToClass(new AnnotationLiteral<HTMLPrettify>() {
                 });
-
         AnnotatedType<T> type= annotatedTypeBuilder.create();
-
         pat.setAnnotatedType(type);
-
     }
 }
 ~~~
@@ -334,18 +330,16 @@ public class HTMLAnnotationProcessor extends AbstractProcessor {
  
 
 ### Lombok 
-Lombok has become one of the most popular compiler plugins, 
-given all of the functionality that it provides with just a few annotations.
+Lombok has become one of the most popular compiler plugins, given all of the functionality that it provides with just a few annotations.
 
-Of special note is that compiler plugins are not supposed to change the AST (Abstract Syntax Tree). 
-Compiler plugins can validate the resources, they can create new resources, but (in theory) they can't change the existing code.
+Of special note is that compiler plugins are not supposed to change the AST (Abstract Syntax Tree). Compiler plugins can validate the resources, they can create new resources, but (in theory) they can't change the existing code.
+
 So how does Lombok work? It uses undocumented APIs in the HotSpot compiler and Eclipse's JDT compiler to modify the AST.  
-While the functionality provided by the library is very valuable, it's worth keeping in mind that it depends on undocumented functionality that might prevent upgrading to newer or different compilers.
 
-More discussion of these controversies can be read [here](http://jnb.ociweb.com/jnb/jnbJan2010.html#controversy).
+While the functionality provided by the library is very valuable, it's worth keeping in mind that it depends on undocumented functionality that might prevent upgrading to newer or different compilers. More discussion of these controversies can be read [here](http://jnb.ociweb.com/jnb/jnbJan2010.html#controversy).
 
 ## to be continued...
 
-On part two we'll see how the behavior is actually implemented. We'll look at Dynamic Proxies and Bytecode Manipulation.
+Next week we'll see how the behavior is actually implemented. We'll look at Dynamic Proxies and Bytecode Manipulation.
 
 Meanwhile, feel free to drop a note in the comment section.

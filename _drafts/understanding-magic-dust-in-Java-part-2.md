@@ -1,7 +1,7 @@
 ---
 layout: post
 title: Understanding Magic Dust in Java and the JVM (part 2)
-date: '2016-05-31T17:22:00.000-07:00'
+date: '2017-01-16T07:00:00.000-06:00'
 author: Andres Olarte
 tags:
 - classloader
@@ -13,7 +13,7 @@ tags:
 
 # The technical nitty gritty 
 
-In part one we examined how the behavior is injected into the application.
+In part one we examined how the behavior associated to annotations  is injected into the application.
 In the next few sections we'll see how the implementation of the behavior actually works.
  
  
