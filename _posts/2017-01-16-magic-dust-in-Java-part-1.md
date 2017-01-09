@@ -16,17 +16,17 @@ There are many things that developers take for granted, without understanding ho
 
 One of the questions I get every so often is:
 
-> Where do I put the behaviour for an annotation I just created?
+> Where do I put the behavior for an annotation I just created?
 
-The answer is to this question is fairly complicated. First, because annotations don't have any behaviour. 
+The answer is to this question is fairly complicated. First, because annotations don't have any behavior. 
 They're just metadata. Second, because most answers will normally lead to something along the lines of:
 
-> But annotations do seem to have behaviour, just look at all the stuff that happens when I mark a method @Transactional, @RolesAllowed, etc... 
+> But annotations do seem to have behavior, just look at all the stuff that happens when I mark a method @Transactional, @RolesAllowed, etc... 
 
 And that's a very valid point, some annotations do appear to have behavior. I recently even hear people half jokingly reference to this as "Annotation Driven Development". But in reality, annotations are just the magic dust that we sprinkle in our code, indirectly causing all kinds of black magic to happen on the background. 
 
-The truth is that this service class that you annotated with with `@Transactional` will only exhibit transactional behaviour in very particular cases. 
-Instantiating your class using the `new` operator will NOT add transactional behaviour regardless of the presence of `@Transactional` annotations.
+The truth is that this service class that you annotated with with `@Transactional` will only exhibit transactional behavior in very particular cases. 
+Instantiating your class using the `new` operator will NOT add transactional behavior regardless of the presence of `@Transactional` annotations.
 So how does it actually work?  Let's grab our magic dust and fly away to Neverland to find out...
 
 ## The basics, cross-cutting concerns and pointcuts
@@ -34,7 +34,7 @@ So how does it actually work?  Let's grab our magic dust and fly away to Neverla
  Aspect-oriented programming or AOP is a programming paradigm that allows separation of cross cutting concerns from core concerns. 
  Cross cutting concerns are applied based on point cuts.
  
-* **Cross cutting concerns** are aspects of a system that affect of other core concerns.
+* **Cross cutting concerns** are aspects of a system that affect the behavior of other core concerns.
 * **Core concerns** are the main tasks that a program is written to satisfy. Core concerns normally include the business logic.
 * **Pointcuts** define where exactly to apply advice (inject the cross cutting concern).
 
@@ -43,7 +43,7 @@ been widely used by frameworks to apply framework provided functionality to exis
 
 # How does it actually work?
 
-The behaviour is really injected through means separate from the annotations, the annotations really just mark where should be done. 
+The behavior is really injected through means separate from the annotations, the annotations really just mark where should be done. 
 We'll now look at how it's done at the Dependency Injection (DI) level, through Java Agents at runtime, and during the compile phase by using compiler annotation processors.
 
 ## Dependency Injection Container
