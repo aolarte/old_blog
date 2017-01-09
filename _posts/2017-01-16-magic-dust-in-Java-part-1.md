@@ -18,12 +18,12 @@ One of the questions I get every so often is:
 
 > Where do I put the behavior for an annotation I just created?
 
-The answer is to this question is fairly complicated. First, because annotations don't have any behavior. 
+The answer to this question is fairly complicated. First, because annotations don't have any behavior. 
 They're just metadata. Second, because most answers will normally lead to something along the lines of:
 
 > But annotations do seem to have behavior, just look at all the stuff that happens when I mark a method @Transactional, @RolesAllowed, etc... 
 
-And that's a very valid point, some annotations do appear to have behavior. I recently even hear people half jokingly reference to this as "Annotation Driven Development". But in reality, annotations are just the magic dust that we sprinkle in our code, indirectly causing all kinds of black magic to happen on the background. 
+And that's a very valid point, some annotations do appear to have behavior. I recently even heard people half jokingly reference to this as "Annotation Driven Development". But in reality, annotations are just the magic dust that we sprinkle in our code, indirectly causing all kinds of black magic to happen on the background. 
 
 The truth is that this service class that you annotated with with `@Transactional` will only exhibit transactional behavior in very particular cases. 
 Instantiating your class using the `new` operator will NOT add transactional behavior regardless of the presence of `@Transactional` annotations.
@@ -34,8 +34,8 @@ So how does it actually work?  Let's grab our magic dust and fly away to Neverla
  Aspect-oriented programming or AOP is a programming paradigm that allows separation of cross cutting concerns from core concerns. 
  Cross cutting concerns are applied based on point cuts.
  
-* **Cross cutting concerns** are aspects of a system that affect the behavior of other core concerns.
 * **Core concerns** are the main tasks that a program is written to satisfy. Core concerns normally include the business logic.
+* **Cross cutting concerns** are aspects of a system that affect the behavior of other core concerns. These include things like security, logging, transactions, etc.
 * **Pointcuts** define where exactly to apply advice (inject the cross cutting concern).
 
 While AOP never lived up to the hype it generated at some point in the past, some of its patterns have 
@@ -48,10 +48,9 @@ We'll now look at how it's done at the Dependency Injection (DI) level, through 
 
 ## Dependency Injection Container
 
-Your favorite dependency injection framework is normally one of the ways in which annotations can be associated with actual behavior.
-Basically the DI container will wrap the actual bean before injecting it. 
-We'll see examples in the three (arguably) most popular DI frameworks. 
-The examples will turn strings into HTML (basically just wrap the string in `<p></p>` tags).
+Your favorite dependency injection framework is normally one of the ways in which annotations are associated with actual behavior. Basically the DI container will wrap the actual bean before injecting it. 
+
+We'll see examples in the three (arguably) most popular DI frameworks. The examples will turn strings into HTML (basically just wrap the string in `<p></p>` tags).
 
 A sample service that will be instrumented looks like this:
 
@@ -129,11 +128,11 @@ public class HTMLPrettifyInterceptor {
 }
 ~~~
 
-* `@Interceptor` We mark the class as an interceptor, this will let CDI know the special purpose of this class
-* `@HTMLPrettify` This is the actual annotation that we want to provide behavior for
+* `@Interceptor` We mark the class as an interceptor, this will let CDI know the special purpose of this class.
+* `@HTMLPrettify` This is the actual annotation that we want to provide behavior for. 
 * `@AroundInvoke` Indicates the type of advice. This allows us access change the paramters used to invoke the underlying logic, change the return value, or return something completely different.
 
-The annotation need for CDI it self has a few special requirements:
+The annotation that we're going to bind to has a few special requirements:
 
 ~~~java
 import javax.interceptor.InterceptorBinding;
@@ -156,8 +155,7 @@ public @interface HTMLPrettify {
 * `@Retention` Should normally be `RUNTIME` to ensure that the annotation is available to the JVM time. The default is `CLASS`
  
 
-To enable the interceptor, it must be defined in the `beans.xml` file. 
-This is needed to be able to define the order in which the interceptors will fire
+To enable the interceptor, it must be defined in the `beans.xml` file. This is needed to be able to define the order in which the interceptors will fire.
 
 ~~~xml
 <beans xmlns="http://xmlns.jcp.org/xml/ns/javaee"
@@ -211,6 +209,8 @@ After doing this, the any `@HTML` annotated objects created by the CDI container
 
 ### Google Guice
 
+Google Guice uses the standard `MethodInterceptor` interface defined in the core AOP library:
+
 ~~~java
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
@@ -229,7 +229,7 @@ public class HTMLPrettifyInterceptor implements MethodInterceptor {
 }
 ~~~
 
-Interceptors will need to be registered in one of your modules, including a `Matcher` specifying which objects to intercept.
+Interceptors (the cross-cutting concern) will need to be registered in one of your modules, including a `Matcher` specifying which objects to intercept (the point-cut definition).
 
 ~~~java
 public class TestModule extends AbstractModule {
@@ -246,7 +246,7 @@ In this case we're binding the interceptor to any class that has a method annota
 ## Java Agents
 
 Java agents can be configured at startup, and provide mechanisms to change classes as they're being loaded by the JVM.
-These agents exist on layer that is closer to the bare metal than the class loader.
+These agents exist on a layer that is closer to the bare metal than the class loader.
 
 ~~~java
 public class TestAgent {
@@ -276,7 +276,7 @@ public class TestAgent {
 
 Java agents provide access to the raw bytes that make up the class. The same bytes you would see in a `.class` file. 
 While you're welcome to modify the byte array by hand, it's more practical to use a byte code manipulation library. 
-A complete example using Javassist can be seen (here)[https://github.com/aolarte/minitrue].
+A complete example using Javassist can be seen [here](https://github.com/aolarte/minitrue).
 
 Java agents must be specified in the command line when starting the JVM process:
 
@@ -289,18 +289,15 @@ Java agents must be specified in the command line when starting the JVM process:
 
 ## Annotation processors
 
-Annotation processors are executed by the standard java compiler `javac`. 
-These processors allow extensions to apply validation rules or generate new resources.
-Tools such as Dagger and Lombok make their make happen using annotation processors.
+Annotation processors are executed by the standard java compiler `javac`. These processors allow extensions to apply validation rules or generate new resources. Tools such as Dagger and Lombok make their magic happen using annotation processors.
 
-
-Compile time annotation processors are registered using the standard Java extension mechanism. 
-These extensions are declared in file named `javax.annotation.processing.Processor` in the `META-INF/services` directory.
-This file will simply list the FQN of the extensions we want to use:
+Compile time annotation processors are registered using the standard Java extension mechanism. These extensions are declared in file named `javax.annotation.processing.Processor` in the `META-INF/services` directory. This file will simply list the FQN of the extensions we want to use:
 
 ~~~
 com.andresolarte.compile.processor.HTMLAnnotationProcessor
 ~~~
+
+Any jar file in the compiler classpath will be scanned by the compiler to determine if it declares one or more annotation processors.
 
 The actual annotation processor must extend [AbstractProcessor](https://docs.oracle.com/javase/8/docs/api/javax/annotation/processing/AbstractProcessor.html):
 
@@ -339,4 +336,4 @@ While the functionality provided by the library is very valuable, it's worth kee
 
 Next week we'll see how the behavior is actually implemented. We'll look at Dynamic Proxies and Bytecode Manipulation.
 
-Meanwhile, feel free to drop a note in the comment section.
+Meanwhile, feel free to drop a note in the comments section.
