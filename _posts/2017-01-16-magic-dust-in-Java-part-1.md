@@ -250,6 +250,7 @@ These agents exist on layer that is closer to the bare metal than the class load
 
 ~~~java
 public class TestAgent {
+
     public static void premain(String agentArguments,
                                Instrumentation instrumentation){
         ClassFileTransformer transformer=new TestTransformer();
@@ -269,11 +270,7 @@ public class TestAgent {
             }
             return ret;
         }
-
     }
-
-
-
 }
 ~~~
 
