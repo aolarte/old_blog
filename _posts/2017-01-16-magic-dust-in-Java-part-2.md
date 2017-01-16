@@ -154,6 +154,8 @@ In transaction management for example, before entering a method marked as [@Tran
 
 Security annotations work in a similar fashion, with the authentication code storing the authorization information in `ThreadLocal`. This information is it's accessible by the proxy code wrapping methods annotated with (@RolesAllowed)[http://docs.oracle.com/javaee/6/api/javax/annotation/security/RolesAllowed.html]. 
 
+While this is not a discussion about `ThreadLocal` it's worth mentioning that as the name implies the information stored in such a variable is only available to code executing in the same thread. Special logic must take care of propagating this information to other threads in the JVM, or to a remote thread in case of RMI.
+
 ## Final notes
 
 Despite their bad rep in the early days, JDK dynamic proxies have performance that is within the realm of bytecode generation.
