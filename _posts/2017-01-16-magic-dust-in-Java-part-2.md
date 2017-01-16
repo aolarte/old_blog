@@ -13,7 +13,7 @@ tags:
 
 # The technical nitty gritty 
 
-In part one we examined how the behavior associated to annotations  is injected into the application.
+In [part one](/2017/01/09/magic-dust-in-Java-part-1.html) we examined how the behavior associated to annotations  is injected into the application.
 In the next few sections we'll see how the implementation of the behavior actually works.
  
  
@@ -146,12 +146,19 @@ Hello Test!
 <p>Hello Test!</p>
 ~~~
 
+## ThreadLocal, the missing link 
+
+So how does a framework like Spring implement functionality such as transaction propagation and security? In many case the secret behind the proxies is [ThreadLocal](https://docs.oracle.com/javase/7/docs/api/java/lang/ThreadLocal.html)!
+
+In transaction management for example, before entering a method marked as [@Transactional](https://javaee-spec.java.net/nonav/javadocs/javax/transaction/Transactional.html), the proxy code will check in a `ThreadLocal` variable to see if there's a transaction in progress. If there is, it will be reused (reentrant transactions), otherwise a new one will be created and stored in `ThreadLocal` for access down the stack.
+
+Security annotations work in a similar fashion, with the authentication code storing the authorization information in `ThreadLocal`. This information is it's accessible by the proxy code wrapping methods annotated with (@RolesAllowed)[http://docs.oracle.com/javaee/6/api/javax/annotation/security/RolesAllowed.html]. 
 
 ## Final notes
 
 Despite their bad rep in the early days, JDK dynamic proxies have performance that is within the realm of bytecode generation.
 Nowadays the decision between using JDK Dynamic Proxies or one of the code generation libraries is not clear cut. 
-For example Spring will fallback to JDK Dynamic Proxies if no code generation library is available.  
-Regardless of the chosen method, just keep in mind that behind the covers, most moder web application are using plenty of proxies for a variety of uses!
+For example Spring will fallback to JDK Dynamic Proxies if no code generation library is available (and as long a you're only injecting interfaces).  
+Regardless of the chosen method, just keep in mind that behind the covers, most moder web application are using plenty of proxies for a variety of critical functionality!
 
 Thanks for reading, and if you have any questions or comments, feel free to drop a note in the comment section.

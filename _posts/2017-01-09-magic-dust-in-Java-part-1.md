@@ -334,6 +334,6 @@ While the functionality provided by the library is very valuable, it's worth kee
 
 ## to be continued...
 
-Next week we'll see how the behavior is actually implemented. We'll look at Dynamic Proxies and Bytecode Manipulation.
+In [part two](/2017/01/16/magic-dust-in-Java-part-2.html) see how the behavior is actually implemented. We'll look at Dynamic Proxies and Bytecode Manipulation.
 
-Meanwhile, feel free to drop a note in the comments section.
+Feel free to drop a note in the comments section.
