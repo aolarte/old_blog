@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Talking at "Nerd Interface" Machine Learning for Clustering & Sentiment Analysis
+title: Talking at "Nerd Interface" - Machine Learning for Clustering & Sentiment Analysis
 date: '2017-02-07T07:00:00.000-06:00'
 author: Andres Olarte
 tags:
